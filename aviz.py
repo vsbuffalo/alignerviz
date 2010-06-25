@@ -7,7 +7,12 @@ Based on the paper by Vlachos, Taneri, Keogh, and Yu, 2007
 """
 
 USAGE = """%prog [-p graph_out.pdf] file.fasta
-Fastest on a few relatively short (>1000bp) sequences.
+Fastest on a few relatively short (>1000bp) sequences, but longer and
+more sequences can be processed.
+
+Examples:
+python aviz.py -a 0.20 -l 2 test.fasta
+python aviz.py -a 0.20 -l 4 -b -H 'fake sequence 1' test.fasta
 """
 
 from optparse import OptionParser, OptionGroup
@@ -52,31 +57,45 @@ def render(trajectory):
     points = (x, y, z)
     return points
 
-def plot(seq_file, alpha, black, lwidth=1, show=True):
+def plot(seq_file, highlight=None, alpha=1, black=False, lwidth=1, show=True):
+    # highlighting works with black only;
+    black = True if highlight is not None else black
+    
     mpl.rcParams['legend.fontsize'] = 10
     seqs = dict()
     file_obj = open(seq_file)
     i = 0
+    highlight_found = False
     for line in file_obj:
         if line.startswith('>'):
             # grab header, use as key
             line = line.strip()
             header = line[1:]
 
-            # grab sequence (next in iterator) and trajectorizesequence 
+            # grab sequence (next in iterator) and trajectorize
             line = file_obj.next()
             line = line.strip()
             t = trajectorize(line)
-            seqs[header] = t
+
+            if highlight is not None and header == highlight:
+                # make value a tuple with second element as highlighted status
+                seqs[header] = (t, True)
+                highlight_found = True
+            else:
+                seqs[header] = (t, False)
         i += 1
+    if not highlight_found:
+        print "Note: the header file specified was not found in this file"
 
     fig = plt.figure()
     ax = Axes3D(fig)
 
     for seq in seqs:
-        x, y, z = render(seqs[seq])
+        points, highlight = seqs[seq]
+        x, y, z = render(points)
         if black:
-            ax.plot(x, y, z, label=seq, alpha=alpha, color='black')
+            col = 'red' if highlight else 'black'
+            ax.plot(x, y, z, label=seq, alpha=alpha, color=col)
         else:
             ax.plot(x, y, z, label=seq, alpha=alpha, linewidth=lwidth)
 
@@ -97,12 +116,15 @@ if __name__ == "__main__":
                       help="Force black color (default: off)")
     parser.add_option("-l", "--linewidth", dest="linewidth", default=1, 
                       help="Line width (default: 1)")
+    parser.add_option("-H", "--highlight", dest="highlight", default=None, 
+                      help="FASTA header to highlight (default: None)")
     (options, args) = parser.parse_args()
 
     if os.path.exists(args[0]):
         show = True if options.plotpdf is None else False
-        plt, seqs = plot(args[0], black=options.black, lwidth=int(options.linewidth),
-                         alpha=float(options.alpha), show=show)
+        plt, seqs = plot(args[0], highlight=options.highlight, black=options.black,
+                         lwidth=int(options.linewidth), alpha=float(options.alpha),
+                         show=show)
         if options.plotpdf is not None:
             plt.savefig(options.plotpdf, format='pdf', facecolor='black')
     else:
