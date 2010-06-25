@@ -47,7 +47,7 @@ def render(trajectory):
         tx, ty = points
         x.append(x[-1] + tx)
         y.append(y[-1] + ty)
-        z.append(i)
+        z.append(i + 1)  # increment is a visual fix for first base
 
     points = (x, y, z)
     return points
