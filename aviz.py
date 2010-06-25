@@ -84,7 +84,7 @@ def plot(seq_file, highlight=None, alpha=1, black=False, lwidth=1, show=True):
             else:
                 seqs[header] = (t, False)
         i += 1
-    if not highlight_found:
+    if highlight is not None and not highlight_found:
         print "Note: the header file specified was not found in this file"
 
     fig = plt.figure()
