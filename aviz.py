@@ -120,6 +120,9 @@ if __name__ == "__main__":
                       help="FASTA header to highlight (default: None)")
     (options, args) = parser.parse_args()
 
+    if len(args) < 1:
+        parser.error("please specify a file")
+
     if os.path.exists(args[0]):
         show = True if options.plotpdf is None else False
         plt, seqs = plot(args[0], highlight=options.highlight, black=options.black,
