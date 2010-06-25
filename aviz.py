@@ -1,7 +1,7 @@
 """
 aviz - AlignerVIZ
 Author: Vince Buffalo <vsbuffaloAAAA@gmail.com> (with the poly-A tail removed)
-Copyright (c) 2010 The Regents of University of California, Davis Campus.
+Copyright (c) 2010 The Regents of University of California, Davis.
 All rights reserved.
 Based on the paper by Vlachos, Taneri, Keogh, and Yu, 2007
 """
@@ -52,7 +52,8 @@ def render(trajectory):
     points = (x, y, z)
     return points
 
-def plot(seq_file, show=True):
+def plot(seq_file, alpha, black, lwidth=1, show=True):
+    mpl.rcParams['legend.fontsize'] = 10
     seqs = dict()
     file_obj = open(seq_file)
     i = 0
@@ -74,7 +75,10 @@ def plot(seq_file, show=True):
 
     for seq in seqs:
         x, y, z = render(seqs[seq])
-        ax.plot(x, y, z, label=seq)
+        if black:
+            ax.plot(x, y, z, label=seq, alpha=alpha, color='black')
+        else:
+            ax.plot(x, y, z, label=seq, alpha=alpha, linewidth=lwidth)
 
     ax.legend()
     if show:
@@ -87,10 +91,18 @@ if __name__ == "__main__":
     parser.add_option("-p", "--plotpdf", dest="plotpdf", metavar="FILE", 
                       help="Output graph to PDF file specified (default: off)",
                       default=None)
+    parser.add_option("-a", "--alpha", dest="alpha", default=1,
+                      help="Set alpha (default: 1)")
+    parser.add_option("-b", "--black", dest="black", default=False, action="store_true",
+                      help="Force black color (default: off)")
+    parser.add_option("-l", "--linewidth", dest="linewidth", default=1, 
+                      help="Line width (default: 1)")
     (options, args) = parser.parse_args()
 
     if os.path.exists(args[0]):
-        plt, seqs = plot(args[0], True if options.plotpdf is None else False)
+        show = True if options.plotpdf is None else False
+        plt, seqs = plot(args[0], black=options.black, lwidth=int(options.linewidth),
+                         alpha=float(options.alpha), show=show)
         if options.plotpdf is not None:
             plt.savefig(options.plotpdf, format='pdf', facecolor='black')
     else:
