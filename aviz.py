@@ -7,7 +7,7 @@ Based on the paper by Vlachos, Taneri, Keogh, and Yu, 2007
 """
 
 USAGE = """%prog [-p graph_out.pdf] file.fasta
-Fastest on a few relatively short (>1000bp) sequences, but longer and
+Fastest on a few relatively short (<1000bp) sequences, but longer and
 more sequences can be processed.
 
 Examples:
@@ -17,18 +17,19 @@ python aviz.py -a 0.20 -l 4 -b -H 'fake sequence 1' test.fasta
 
 from optparse import OptionParser, OptionGroup
 import os.path
+import sys
 
-import_msg = "Package '%s' was not found; please install it."
+import_msg = "Error on importing package '%s'. If it doesn't exist, install it.\nMessage: %s"
 try:
     import matplotlib as mpl
     from mpl_toolkits.mplot3d import Axes3D
     import matplotlib.pyplot as plt
-except ImportError:
-    print import_msg % 'matplotlib'
+except ImportError, error:
+    sys.exit(import_msg % ('matplotlib', error))
 try:
     import numpy as np
 except ImportError:
-    print import_msg % 'numpy'
+    sys.exit(import_msg % ('numpy', error))
 
 from operator import itemgetter
 
@@ -121,7 +122,7 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     if len(args) < 1:
-        parser.error("please specify a file")
+        parser.error("Please specify a file.")
 
     if os.path.exists(args[0]):
         show = True if options.plotpdf is None else False
@@ -131,5 +132,5 @@ if __name__ == "__main__":
         if options.plotpdf is not None:
             plt.savefig(options.plotpdf, format='pdf', facecolor='black')
     else:
-        parser.error("file specified does not exist")
+        parser.error("File specified does not exist".)
     
