@@ -1,6 +1,6 @@
 # alignerviz - Visualize many sequences in three dimensions.
 
-![Example of alignerviz's ouput](raw/master/example.png)
+![Example of alignerviz's ouput](alignerviz/raw/master/example.png)
 
 
 ## About
