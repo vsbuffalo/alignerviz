@@ -1,5 +1,8 @@
 # alignerviz - Visualize many sequences in three dimensions.
 
+![Example of alignerviz's ouput](example.png)
+
+
 ## About
 
 Large genomic sequences are often difficult for the human eye to

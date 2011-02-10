@@ -132,5 +132,5 @@ if __name__ == "__main__":
         if options.plotpdf is not None:
             plt.savefig(options.plotpdf, format='pdf', facecolor='black')
     else:
-        parser.error("File specified does not exist".)
+        parser.error("File specified does not exist.")
     
